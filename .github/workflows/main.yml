@@ -1,31 +1,49 @@
-name: Deploy .NET Fullstack
+steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-on:
-  push:
-    branches: ["main"]
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x' 
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+    - name: Publish Code
+      # Nhớ thay tên thư mục code của bạn cho đúng
+      run: dotnet publish ./DemoSomee -c Release -o ./publish
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    # --- BƯỚC MỚI: TẠO FILE APP_OFFLINE ĐỂ KHÓA SERVER ---
+    - name: Create app_offline.htm
+      run: echo "<html><body><h1>Dang cap nhat Server...</h1></body></html>" > ./publish/app_offline.htm
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: "8.0.x" # Hoặc 6.0, 7.0 tùy project bạn tạo
+    # 1. Upload file app_offline.htm trước để Server nhả file DLL ra
+    - name: Take Site Offline
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./publish/
+        server-dir: /www.dh52201267oss.somee.com/
+        # Chỉ upload đúng 1 file này thôi
+        include: "app_offline.htm" 
 
-      - name: Publish Code
-        # Lệnh này sẽ build cả C# lẫn copy file wwwroot ra thư mục publish
-        run: dotnet publish **/*.csproj -c Release -o ./publish
+    # 2. Đợi 5 giây cho Server kịp nhả khóa
+    - name: Wait for Lock Release
+      run: sleep 5
 
-      - name: Upload to Somee
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./publish/
-          server-dir: /www.dh52201267oss.somee.com/ # Đường dẫn Somee của bạn
+    # 3. Upload toàn bộ code (Lúc này server đã an toàn để ghi đè)
+    - name: Upload Application
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./publish/
+        server-dir: /www.dh52201267oss.somee.com/
+        # Upload đè tất cả
+    
+    # 4. Quan trọng: Xóa file app_offline.htm để Web chạy lại
+    # (Action này không hỗ trợ xóa file, nên ta phải dùng mẹo:
+    # Upload một file app_offline.htm RỖNG hoặc dùng FTP command khác.
+    # Tuy nhiên với Somee Free tier, cách trên đôi khi vẫn bị chậm.
+    # NẾU BẠN THẤY CÁCH NÀY PHỨC TẠP -> HÃY DÙNG CÁCH THỦ CÔNG SỐ 2 CHO LÀNH)
