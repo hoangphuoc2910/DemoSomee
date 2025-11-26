@@ -18,8 +18,8 @@ jobs:
           dotnet-version: "8.0.x" # Hoặc 6.0, 7.0 tùy project bạn tạo
 
       - name: Publish Code
-        # Lệnh này sẽ build cả C# lẫn copy file wwwroot ra thư mục publish
-        run: dotnet publish -c Release -o ./publish
+      # Dùng **/*.csproj để nó tự đi tìm file dự án trong mọi ngóc ngách
+        run: dotnet publish **/*.csproj -c Release -o ./publish
 
       - name: Upload to Somee
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
