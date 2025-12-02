@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Server Status | Demo Somee</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
         body {
             height: 100vh;
             display: flex;
@@ -24,12 +30,13 @@
             background: rgba(255, 255, 255, 0.9);
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             text-align: center;
             width: 90%;
             max-width: 400px;
             transition: transform 0.3s ease;
-            backdrop-filter: blur(10px); /* Hiệu ứng kính mờ */
+            backdrop-filter: blur(10px);
+            /* Hiệu ứng kính mờ */
         }
 
         .card:hover {
@@ -50,8 +57,17 @@
             transition: all 0.5s ease;
         }
 
-        h1 { font-size: 24px; margin-bottom: 10px; color: #1a1a1a; }
-        p { color: #666; font-size: 14px; margin-bottom: 30px; }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+
+        p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
 
         .btn {
             background: linear-gradient(to right, #667eea, #764ba2);
@@ -85,7 +101,8 @@
             padding: 15px;
             border-radius: 10px;
             background: #f8f9fa;
-            display: none; /* Ẩn đi khi chưa có dữ liệu */
+            display: none;
+            /* Ẩn đi khi chưa có dữ liệu */
             animation: fadeIn 0.5s ease;
         }
 
@@ -98,8 +115,15 @@
             margin-right: 5px;
         }
 
-        .status-live { background-color: #2ecc71; box-shadow: 0 0 10px #2ecc71; }
-        .status-error { background-color: #e74c3c; box-shadow: 0 0 10px #e74c3c; }
+        .status-live {
+            background-color: #2ecc71;
+            box-shadow: 0 0 10px #2ecc71;
+        }
+
+        .status-error {
+            background-color: #e74c3c;
+            box-shadow: 0 0 10px #e74c3c;
+        }
 
         .info-row {
             display: flex;
@@ -109,26 +133,48 @@
             border-bottom: 1px dashed #eee;
             padding-bottom: 8px;
         }
-        .info-row:last-child { border: none; margin: 0; padding: 0; }
-        .info-label { color: #888; }
-        .info-value { font-weight: 600; color: #333; }
+
+        .info-row:last-child {
+            border: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .info-label {
+            color: #888;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #333;
+        }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
+
         /* Animation xoay tròn khi loading */
-        .fa-spin-fast { animation: fa-spin 1s infinite linear; }
+        .fa-spin-fast {
+            animation: fa-spin 1s infinite linear;
+        }
     </style>
 </head>
+
 <body>
 
     <div class="card">
         <div class="icon-box" id="mainIcon">
             <i class="fas fa-server"></i>
         </div>
-        
+
         <h1>Kết nối Server</h1>
         <p>Kiểm tra trạng thái hệ thống trên Somee</p>
 
@@ -158,7 +204,7 @@
             const iconBox = document.getElementById('mainIcon');
             const icon = iconBox.querySelector('i');
             const resultArea = document.getElementById('resultArea');
-            
+
             // 1. Hiệu ứng Loading
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Đang kết nối...';
@@ -170,11 +216,11 @@
             try {
                 // 2. Gọi API (Delay giả 0.5s để nhìn thấy hiệu ứng loading cho đẹp)
                 const start = Date.now();
-                const response = await fetch('/api/time');
-                
+                const response = await fetch('http://dh52201267oss.somee.com/api/time');
+
                 // Đảm bảo loading chạy ít nhất 800ms cho mượt
                 const duration = Date.now() - start;
-                if(duration < 800) await new Promise(r => setTimeout(r, 800 - duration));
+                if (duration < 800) await new Promise(r => setTimeout(r, 800 - duration));
 
                 if (!response.ok) throw new Error('Không thể kết nối');
                 const data = await response.json();
@@ -182,11 +228,11 @@
                 // 3. Xử lý thành công (Giao diện xanh lá)
                 document.getElementById('serverTime').innerText = data.serverTime;
                 document.getElementById('serverMsg').innerText = data.message;
-                
+
                 icon.className = 'fas fa-check-circle';
                 iconBox.style.color = '#2ecc71'; // Màu xanh
                 iconBox.style.background = '#dbfdf0';
-                
+
                 resultArea.style.display = 'block';
 
             } catch (error) {
@@ -203,4 +249,5 @@
         }
     </script>
 </body>
+
 </html>

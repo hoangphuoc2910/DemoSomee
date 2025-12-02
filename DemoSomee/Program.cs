@@ -1,29 +1,28 @@
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllers();
+
+// 1. THÊM DỊCH VỤ CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ChoPhepInfinityFree",
+        policy =>
+        {
+            policy.AllowAnyOrigin()  // Cho phép mọi tên miền gọi vào
+                  .AllowAnyMethod()  // Cho phép GET, POST, PUT...
+                  .AllowAnyHeader(); // Cho phép mọi Header
+        });
+});
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseDeveloperExceptionPage();
-}
+// ... (Các dòng cấu hình khác giữ nguyên)
 
 app.UseHttpsRedirection();
 
-// --- BẮT ĐẦU ĐOẠN QUAN TRỌNG ---
-// Cho phép chạy file tĩnh (html, css, js)
-app.UseDefaultFiles(); 
-app.UseStaticFiles();
-// ------------------------------
+// 2. KÍCH HOẠT CORS (Đặt trước UseAuthorization)
+app.UseCors("ChoPhepInfinityFree"); 
 
 app.UseAuthorization();
-
 app.MapControllers();
-
-// Nếu người dùng vào trang chủ mà không tìm thấy gì, trả về index.html
-app.MapFallbackToFile("index.html"); 
-
 app.Run();
