@@ -1,53 +1,28 @@
-name: Deploy Fullstack Project
+name: Deploy ALL to InfinityFree
 
 on:
-  # 1. Cho phép bấm nút chạy thủ công
-  workflow_dispatch:
-
-  # 2. Tự chạy khi push code vào nhánh main
   push:
     branches:
       - main
-      - master
 
 jobs:
-  deploy-all:
-    name: 🚀 Build & Deploy
+  web-deploy:
+    name: 🚀 Deploy Website
     runs-on: ubuntu-latest
     steps:
-      # Bước 1: Lấy code từ GitHub về máy chủ ảo (Runner)
       - name: 🚚 Get latest code
         uses: actions/checkout@v4
 
-      # Bước 2: Gộp Frontend và Backend vào một thư mục chung (tên là FinalBuild)
-      - name: 🔨 Merge Files
-        run: |
-          # Tạo thư mục chứa file chuẩn bị upload
-          mkdir FinalBuild
-
-          # Copy toàn bộ file trong Frontend vào FinalBuild
-          cp -r Frontend/* FinalBuild/
-
-          # Copy toàn bộ file trong Backend vào FinalBuild
-          cp -r Backend/* FinalBuild/
-
-          # (Tùy chọn) Liệt kê file ra màn hình log để kiểm tra
-          echo "Danh sách file chuẩn bị upload:"
-          ls -R FinalBuild/
-
-      # Bước 3: Upload thư mục FinalBuild lên htdocs của InfinityFree
-      - name: 📂 Sync to InfinityFree
+      - name: 📂 Sync files to htdocs
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.IF_HOST }}
           username: ${{ secrets.IF_USER }}
           password: ${{ secrets.IF_PASS }}
 
-          # Lấy code từ thư mục vừa gộp xong
-          local-dir: ./FinalBuild/
-
-          # Đẩy vào thư mục gốc htdocs
+          # BẮT BUỘC: InfinityFree chỉ chạy web trong thư mục htdocs
           server-dir: htdocs/
 
-          # Không xóa các file khác trên host (cho an toàn)
+          # Tùy chọn: Xóa file rác trên host nếu trên GitHub không có
+          # Lưu ý: Nếu bạn có lưu ảnh upload trên host thì để false
           dangerous-clean-slate: false
