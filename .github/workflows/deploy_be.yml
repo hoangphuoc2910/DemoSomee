@@ -1,14 +1,21 @@
 name: Deploy Backend Only
 
 on:
+  # 1. Cho phép bấm nút chạy thủ công (Quan trọng để test)
+  workflow_dispatch:
+
+  # 2. Tự chạy khi push code
   push:
-    branches: ["main"]
+    branches:
+      - main
+      - master # Thêm dòng này đề phòng nhánh của bạn tên là master
     paths:
-      - "Backend/**" # Chỉ chạy khi có thay đổi trong thư mục Backend
+      - "Backend/**" # Chỉ chạy khi sửa file trong Backend
 
 jobs:
   deploy-be:
     runs-on: ubuntu-latest
+    name: 🚀 Deploy PHP Backend
     steps:
       - name: 🚚 Get latest code
         uses: actions/checkout@v4
@@ -20,11 +27,11 @@ jobs:
           username: ${{ secrets.IF_USER }}
           password: ${{ secrets.IF_PASS }}
 
-          # Lấy code từ thư mục Backend trên GitHub
+          # Lấy code từ thư mục Backend
           local-dir: ./Backend/
 
-          # Đẩy vào thư mục gốc htdocs trên Server
+          # Đẩy vào htdocs
           server-dir: htdocs/
 
-          # CỰC KỲ QUAN TRỌNG: Để false để nó KHÔNG xóa file index.html của Frontend
+          # Không xóa file của Frontend
           dangerous-clean-slate: false

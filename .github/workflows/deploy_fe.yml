@@ -1,14 +1,21 @@
 name: Deploy Frontend Only
 
 on:
+  # 1. Cho phép bấm nút chạy thủ công
+  workflow_dispatch:
+
+  # 2. Tự chạy khi push code
   push:
-    branches: ["main"]
+    branches:
+      - main
+      - master
     paths:
-      - "Frontend/**" # Chỉ chạy khi có thay đổi trong thư mục Frontend
+      - "Frontend/**" # Chỉ chạy khi sửa file trong Frontend
 
 jobs:
   deploy-fe:
     runs-on: ubuntu-latest
+    name: 🎉 Deploy HTML Frontend
     steps:
       - name: 🚚 Get latest code
         uses: actions/checkout@v4
@@ -20,11 +27,11 @@ jobs:
           username: ${{ secrets.IF_USER }}
           password: ${{ secrets.IF_PASS }}
 
-          # Lấy code từ thư mục Frontend trên GitHub
+          # Lấy code từ thư mục Frontend
           local-dir: ./Frontend/
 
-          # Đẩy vào thư mục gốc htdocs trên Server
+          # Đẩy vào htdocs (chung nhà với Backend)
           server-dir: htdocs/
 
-          # CỰC KỲ QUAN TRỌNG: Để false để nó KHÔNG xóa file api.php của Backend
+          # Không xóa file của Backend
           dangerous-clean-slate: false
