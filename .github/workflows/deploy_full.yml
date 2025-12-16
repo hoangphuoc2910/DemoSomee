@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch: # Thêm nút bấm chạy thủ công để test
 
 jobs:
   web-deploy:
@@ -13,6 +14,20 @@ jobs:
       - name: 🚚 Get latest code
         uses: actions/checkout@v4
 
+      - name: 🔨 Prepare Files
+        run: |
+          # Tạo thư mục tạm để gom code
+          mkdir -p deploy_folder
+
+          # Copy index.html nếu nó nằm ở root hoặc trong thư mục Frontend
+          [ -f "index.html" ] && cp index.html deploy_folder/
+          [ -d "Frontend" ] && cp -r Frontend/* deploy_folder/
+
+          # Copy các file PHP nếu chúng nằm ở root hoặc trong thư mục Backend
+          [ -f "api.php" ] && cp api.php deploy_folder/
+          [ -f "config.php" ] && cp config.php deploy_folder/
+          [ -d "Backend" ] && cp -r Backend/* deploy_folder/
+
       - name: 📂 Sync files to htdocs
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -20,9 +35,10 @@ jobs:
           username: ${{ secrets.IF_USER }}
           password: ${{ secrets.IF_PASS }}
 
-          # BẮT BUỘC: InfinityFree chỉ chạy web trong thư mục htdocs
+          # Lấy code từ thư mục vừa gom
+          local-dir: ./deploy_folder/
+
+          # Đẩy vào htdocs
           server-dir: htdocs/
 
-          # Tùy chọn: Xóa file rác trên host nếu trên GitHub không có
-          # Lưu ý: Nếu bạn có lưu ảnh upload trên host thì để false
           dangerous-clean-slate: false
