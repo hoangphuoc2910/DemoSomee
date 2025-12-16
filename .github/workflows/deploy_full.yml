@@ -14,26 +14,24 @@ jobs:
       - name: 🚚 Get latest code
         uses: actions/checkout@v4
 
-      - name: 📂 Sync Frontend to htdocs
+      # Đưa nội dung folder Frontend vào thẳng htdocs
+      - name: 📂 Sync Frontend
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.IF_HOST }}
           username: ${{ secrets.IF_USER }}
           password: ${{ secrets.IF_PASS }}
-
-          # Sửa thành viết thường để khớp với folder của bạn
           local-dir: ./frontend/
           server-dir: htdocs/
           dangerous-clean-slate: false
 
-      - name: 📂 Sync Backend to htdocs
+      # Đưa nội dung folder Backend vào thẳng htdocs
+      - name: 📂 Sync Backend
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.IF_HOST }}
           username: ${{ secrets.IF_USER }}
           password: ${{ secrets.IF_PASS }}
-
-          # Sửa thành viết thường để khớp với folder của bạn
           local-dir: ./backend/
           server-dir: htdocs/
           dangerous-clean-slate: false
