@@ -1,4 +1,4 @@
-name: Deploy ALL to InfinityFree
+name: Deploy Fullstack Project
 
 on:
   push:
@@ -7,14 +7,14 @@ on:
   workflow_dispatch:
 
 jobs:
-  web-deploy:
-    name: 🚀 Deploy Website
+  deploy-all:
+    name: 🚀 Build & Deploy
     runs-on: ubuntu-latest
     steps:
       - name: 🚚 Get latest code
         uses: actions/checkout@v4
 
-      # Đưa nội dung folder Frontend vào thẳng htdocs
+      # Đẩy nội dung thư mục Frontend (index.html) vào htdocs
       - name: 📂 Sync Frontend
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -25,7 +25,7 @@ jobs:
           server-dir: htdocs/
           dangerous-clean-slate: false
 
-      # Đưa nội dung folder Backend vào thẳng htdocs
+      # Đẩy nội dung thư mục Backend (api.php, config.php) vào htdocs
       - name: 📂 Sync Backend
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
